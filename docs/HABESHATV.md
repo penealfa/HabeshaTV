@@ -38,3 +38,12 @@ Undo on the stick: run `restore.sh` in the project folder; it re-enables the sto
   button show the network name), then disable the stock launcher.
 - Build it with `./gradlew assembleRelease` in `launcher/`. Release builds are signed with the debug key, which is
   fine for a sideloaded app that is never published.
+
+## Per-device settings
+Hold OK on an app for the menu. Each setting is saved on the device it is changed on:
+- **Theme** (mesob, tilet, lalibela, buna).
+- **Numbers**: Ge'ez numerals (default) or plain digits for the clock, dates and the position counter.
+- **Brightness**: Normal, Bright or Brightest. It lightens the wallpaper by thinning the dark scrim behind the
+  text; the Normal level is the design's. Only the mesob look has a wallpaper.
+
+The Numbers and Brightness rows are English only until an Amharic word is chosen for each.

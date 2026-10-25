@@ -71,6 +71,8 @@ public class HabeshaHomeActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         state = new HabeshaState((apps, removed) -> HabeshaApps.saveLists(this, apps, removed));
         view = new HabeshaHomeView(this, state, HabeshaTheme.byName(HabeshaApps.savedTheme(this)));
+        view.setGeezNumerals(HabeshaApps.savedGeez(this));
+        view.setBrightness(HabeshaApps.savedBrightness(this));
         view.setTime(System.currentTimeMillis());
         setContentView(view);
         view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -234,6 +236,14 @@ public class HabeshaHomeActivity extends Activity {
             }
         } else if ("theme".equals(action.system)) {
             cycleTheme(false); // from the hold-OK menu: the row shows the name, so no message
+        } else if ("numerals".equals(action.system)) {
+            boolean geez = !view.geezNumerals();
+            HabeshaApps.saveGeez(this, geez);
+            view.setGeezNumerals(geez);
+        } else if ("brightness".equals(action.system)) {
+            int level = (view.brightness() + 1) % 3;
+            HabeshaApps.saveBrightness(this, level);
+            view.setBrightness(level);
         } else if (action.system != null) {
             openSystem(action.system);
         }

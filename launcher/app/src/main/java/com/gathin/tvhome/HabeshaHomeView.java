@@ -47,6 +47,7 @@ final class HabeshaHomeView extends View {
     private HabeshaNet.Info wifi = HabeshaNet.OFFLINE;
     private final GregorianCalendar now = new GregorianCalendar();
     private boolean ethClock = true, ethCalendar = true, geezNumerals = true;
+    private int brightness; // 0 normal, 1 bright, 2 brightest
 
     private final Typeface menLight, menMedium, menSemi, figReg, figMedium, figSemi, figBold, bsLight, bsBold;
 
@@ -125,6 +126,21 @@ final class HabeshaHomeView extends View {
     }
 
     HabeshaTheme theme() { return theme; }
+
+    void setGeezNumerals(boolean geez) {
+        geezNumerals = geez;
+        invalidate();
+    }
+
+    boolean geezNumerals() { return geezNumerals; }
+
+    void setBrightness(int level) {
+        brightness = Math.max(0, Math.min(2, level));
+        scrimShader = null;
+        invalidate();
+    }
+
+    int brightness() { return brightness; }
 
     // ------------------------------------------------------------------ animation
 
@@ -248,7 +264,11 @@ final class HabeshaHomeView extends View {
         paint.setAlpha(255);
         c.drawBitmap(photo, null, box, paint);
         if (scrimShader == null) {
-            scrimShader = new RadialGradient(0, 0, 1152f, new int[]{0xE60B0806, 0xC70B0806, 0x990B0806},
+            // Normal is the design's 90 / 78 / 60 percent black; each step lets more of the wallpaper through.
+            final int[][] levels = {{0xE6, 0xC7, 0x99}, {0xB8, 0x99, 0x6B}, {0x8A, 0x70, 0x40}};
+            int[] a = levels[brightness];
+            scrimShader = new RadialGradient(0, 0, 1152f,
+                    new int[]{(a[0] << 24) | 0x0B0806, (a[1] << 24) | 0x0B0806, (a[2] << 24) | 0x0B0806},
                     new float[]{0f, 0.55f, 1f}, Shader.TileMode.CLAMP);
         }
         c.save();
@@ -551,19 +571,23 @@ final class HabeshaHomeView extends View {
     }
 
     private void drawMenu(Canvas c) {
-        float px = 1120, py = 380, pw = 440, rowH = 76, ph = 16 * 2 + 4 * rowH;
+        final int rows = 6;
+        float px = 1120, py = 340, pw = 440, rowH = 76, ph = 16 * 2 + rows * rowH;
         round(c, px, py, px + pw, py + ph, 28, theme.panel);
         outline(c, px, py, px + pw, py + ph, 28, 1, theme.glassB);
         float hy = anim("menuhl", py + 16 + st.menuIndex * rowH, 220, SPRING, 0);
         round(c, px + 16, hy, px + pw - 16, hy + rowH, 18, theme.focus);
         String name = theme.name.substring(0, 1).toUpperCase() + theme.name.substring(1);
-        String[] am = {HabeshaStrings.am("move"), HabeshaStrings.am("remove"), HabeshaStrings.am("theme"), HabeshaStrings.am("cancel")};
-        String[] en = {"Move", "Remove", name, "Cancel"};
-        for (int i = 0; i < 4; i++) {
+        String[] levels = {"Normal", "Bright", "Brightest"};
+        String[] am = {HabeshaStrings.am("move"), HabeshaStrings.am("remove"), HabeshaStrings.am("theme"), "", "", HabeshaStrings.am("cancel")};
+        String[] en = {"Move", "Remove", name, "Numbers · " + (geezNumerals ? "Ge'ez" : "1 2 3"),
+                "Brightness · " + levels[brightness], "Cancel"};
+        for (int i = 0; i < rows; i++) {
             boolean f = st.menuIndex == i;
             float top = py + 16 + i * rowH;
             int fg = f ? theme.onFocus : theme.text, fg2 = f ? theme.onFocus : theme.text2;
             if (am[i].isEmpty()) {
+                // The Numbers and Brightness rows have no Amharic yet: they are English only until a word is chosen.
                 drawText(c, en[i], px + 16 + 22, top + (rowH - 36) / 2f, 28, 36, figSemi, fg, Paint.Align.LEFT);
             } else {
                 float w1 = drawText(c, am[i], px + 16 + 22, top + (rowH - 28 * 1.5f) / 2f, 28, 28 * 1.5f, menMedium, fg, Paint.Align.LEFT);

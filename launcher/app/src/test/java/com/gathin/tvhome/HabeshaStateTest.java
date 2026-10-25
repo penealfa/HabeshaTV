@@ -211,9 +211,7 @@ public class HabeshaStateTest {
     @Test
     public void menuCancelAndBack() {
         s.hold();
-        s.arrow(0, 1);
-        s.arrow(0, 1);
-        s.arrow(0, 1);
+        for (int i = 0; i < 5; i++) s.arrow(0, 1);
         assertEquals(HabeshaState.MENU_CANCEL, s.menuIndex);
         s.ok();
         assertFalse(s.menuOpen);
@@ -230,14 +228,36 @@ public class HabeshaStateTest {
         assertEquals("theme", first.system);
         assertTrue(s.menuOpen);
         assertEquals("theme", s.ok().system); // again: the next look
-        s.arrow(0, 1);
+        for (int i = 0; i < 3; i++) s.arrow(0, 1);
         s.ok(); // Cancel
         assertFalse(s.menuOpen);
         assertEquals(ids("a", "b", "c", "d", "e"), s.apps()); // nothing was moved or removed
     }
 
     @Test
-    public void menuHasFourRowsAndStopsAtTheEnds() {
+    public void numbersRowAsksToSwitchNumeralsAndKeepsTheMenuOpen() {
+        s.hold();
+        for (int i = 0; i < 3; i++) s.arrow(0, 1);
+        assertEquals(HabeshaState.MENU_NUMBERS, s.menuIndex);
+        assertEquals("numerals", s.ok().system);
+        assertTrue(s.menuOpen);
+        assertEquals("numerals", s.ok().system);
+        assertEquals(ids("a", "b", "c", "d", "e"), s.apps());
+    }
+
+    @Test
+    public void brightnessRowAsksToStepTheWallpaperAndKeepsTheMenuOpen() {
+        s.hold();
+        for (int i = 0; i < 4; i++) s.arrow(0, 1);
+        assertEquals(HabeshaState.MENU_BRIGHTNESS, s.menuIndex);
+        assertEquals("brightness", s.ok().system);
+        assertTrue(s.menuOpen);
+        assertEquals("brightness", s.ok().system);
+        assertEquals(ids("a", "b", "c", "d", "e"), s.apps());
+    }
+
+    @Test
+    public void menuHasSixRowsAndStopsAtTheEnds() {
         s.hold();
         for (int i = 0; i < 10; i++) s.arrow(0, 1);
         assertEquals(HabeshaState.MENU_CANCEL, s.menuIndex);

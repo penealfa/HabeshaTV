@@ -134,4 +134,22 @@ final class HabeshaApps {
         SharedPreferences.Editor e = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit();
         e.putString("theme", name).apply();
     }
+
+    /** Ge'ez numerals (the default) or plain digits, remembered per device. */
+    static boolean savedGeez(Context context) {
+        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean("geez", true);
+    }
+
+    static void saveGeez(Context context, boolean geez) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean("geez", geez).apply();
+    }
+
+    /** 0 normal, 1 bright, 2 brightest: how much of the wallpaper shows through the dark scrim. */
+    static int savedBrightness(Context context) {
+        return Math.max(0, Math.min(2, context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt("brightness", 0)));
+    }
+
+    static void saveBrightness(Context context, int level) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putInt("brightness", level).apply();
+    }
 }
