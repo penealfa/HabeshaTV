@@ -13,12 +13,12 @@ Design source: `HabeshaTV v3.dc.html` (kept outside this repo until the photo ri
 
 ## Status (tested on the Mi Box 4, Android 9)
 Done and seen on the TV: ring home, app launch and return, Wi-Fi panel (name, band, address), library grid,
-Tilet theme via the Menu key, coffee-ceremony saver, Ge'ez numerals, Ethiopian date and clock.
-Not yet tried on the TV: hold-OK menu and move mode, the Settings and Apps buttons, Back handling, how smooth the
-animations feel, the other three themes.
+the Theme row in the hold-OK menu (steps mesob, tilet, lalibela, buna), a still clock screensaver, Ge'ez numerals,
+Ethiopian date and clock, and the basket wallpaper.
+Not yet tried on the TV: move mode, the Remove row, the Settings and Apps buttons, how smooth the animations feel.
 
-Known gaps: the Mi Box remote has no Menu key, so the theme switch is unreachable from it; the debug build is signed
-with the debug key; the wallpaper photo's licence is unverified.
+Known gaps: the Theme row has no Amharic label yet (waiting for a reviewed word); the screensaver no longer drifts,
+so a bright still image stays on screen (burn-in is a risk on OLED sets); the debug build is signed with the debug key; the wallpaper photo's licence is unverified.
 
 Undo on the stick: run `restore.sh` in the project folder; it re-enables the stock launcher and uninstalls this app.
 
@@ -27,5 +27,5 @@ Undo on the stick: run `restore.sh` in the project folder; it re-enables the sto
 2. Ethiopian calendar and clock (`Ethiopic.java`) with tests. DONE
 3. Amharic strings and the Ethiopic font (Menbere), cut down by `tools/build_fonts.py`. DONE
 4. The ring home screen, drawn natively. DONE
-5. Library, move mode, wi-fi panel, coffee-ceremony saver. DONE (move mode untested on the TV)
+5. Library, move mode, wi-fi panel, still clock saver (the coffee-ceremony version was removed on request). DONE
 6. Installed on the stick for testing, stock launcher kept for restore. DONE

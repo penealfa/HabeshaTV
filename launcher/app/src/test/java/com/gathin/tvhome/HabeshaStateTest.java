@@ -221,6 +221,31 @@ public class HabeshaStateTest {
     }
 
     @Test
+    public void themeRowAsksForTheNextLookAndKeepsTheMenuOpen() {
+        s.hold();
+        s.arrow(0, 1);
+        s.arrow(0, 1);
+        assertEquals(HabeshaState.MENU_THEME, s.menuIndex);
+        HabeshaState.Action first = s.ok();
+        assertEquals("theme", first.system);
+        assertTrue(s.menuOpen);
+        assertEquals("theme", s.ok().system); // again: the next look
+        s.arrow(0, 1);
+        s.ok(); // Cancel
+        assertFalse(s.menuOpen);
+        assertEquals(ids("a", "b", "c", "d", "e"), s.apps()); // nothing was moved or removed
+    }
+
+    @Test
+    public void menuHasFourRowsAndStopsAtTheEnds() {
+        s.hold();
+        for (int i = 0; i < 10; i++) s.arrow(0, 1);
+        assertEquals(HabeshaState.MENU_CANCEL, s.menuIndex);
+        for (int i = 0; i < 10; i++) s.arrow(0, -1);
+        assertEquals(HabeshaState.MENU_MOVE, s.menuIndex);
+    }
+
+    @Test
     public void libraryGridNavigation() {
         List<String> many = new ArrayList<>();
         for (int i = 0; i < 13; i++) many.add("p" + i);

@@ -2,7 +2,7 @@
 
 A Habesha-flavoured home screen for an Android TV stick: a ring of apps like a mesob (the woven
 Ethiopian table basket), Amharic in Ge'ez script first with English beneath, the Ethiopian calendar
-and clock, and a coffee-ceremony screensaver (Abol, Tona, Bereka).
+and clock (the big clock shows Ethiopian hours), and a still clock screensaver.
 
 Target device: Xiaomi Mi Box S (`MIBOX4`, codename `oneday`), Android TV 9 (API 28), 32-bit ARM.
 

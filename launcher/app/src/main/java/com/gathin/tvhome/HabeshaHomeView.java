@@ -46,8 +46,6 @@ final class HabeshaHomeView extends View {
     private HabeshaPatterns patterns;
     private HabeshaNet.Info wifi = HabeshaNet.OFFLINE;
     private final GregorianCalendar now = new GregorianCalendar();
-    private long saverStart;
-    private float driftX, driftY;
     private boolean ethClock = true, ethCalendar = true, geezNumerals = true;
 
     private final Typeface menLight, menMedium, menSemi, figReg, figMedium, figSemi, figBold, bsLight, bsBold;
@@ -123,14 +121,6 @@ final class HabeshaHomeView extends View {
 
     void setTime(long millis) {
         now.setTimeInMillis(millis);
-        invalidate();
-    }
-
-    void setSaverStart(long millis) { saverStart = millis; }
-
-    void setDrift(float x, float y) {
-        driftX = x;
-        driftY = y;
         invalidate();
     }
 
@@ -561,20 +551,25 @@ final class HabeshaHomeView extends View {
     }
 
     private void drawMenu(Canvas c) {
-        float px = 1120, py = 380, pw = 440, ph = 16 * 2 + 3 * 76;
+        float px = 1120, py = 380, pw = 440, rowH = 76, ph = 16 * 2 + 4 * rowH;
         round(c, px, py, px + pw, py + ph, 28, theme.panel);
         outline(c, px, py, px + pw, py + ph, 28, 1, theme.glassB);
-        float hy = anim("menuhl", py + 16 + st.menuIndex * 76, 220, SPRING, 0);
-        round(c, px + 16, hy, px + pw - 16, hy + 76, 18, theme.focus);
-        String[] am = {HabeshaStrings.am("move"), HabeshaStrings.am("remove"), HabeshaStrings.am("cancel")};
-        String[] en = {"Move", "Remove", "Cancel"};
-        for (int i = 0; i < 3; i++) {
+        float hy = anim("menuhl", py + 16 + st.menuIndex * rowH, 220, SPRING, 0);
+        round(c, px + 16, hy, px + pw - 16, hy + rowH, 18, theme.focus);
+        String name = theme.name.substring(0, 1).toUpperCase() + theme.name.substring(1);
+        // The Theme row has no Amharic yet (it has not been reviewed), so it is English only.
+        String[] am = {HabeshaStrings.am("move"), HabeshaStrings.am("remove"), "", HabeshaStrings.am("cancel")};
+        String[] en = {"Move", "Remove", "Theme · " + name, "Cancel"};
+        for (int i = 0; i < 4; i++) {
             boolean f = st.menuIndex == i;
-            float top = py + 16 + i * 76;
-            float w1 = drawText(c, am[i], px + 16 + 22, top + (76 - 28 * 1.5f) / 2f, 28, 28 * 1.5f, menMedium,
-                    f ? theme.onFocus : theme.text, Paint.Align.LEFT);
-            drawText(c, en[i], px + 16 + 22 + w1 + 16, top + (76 - 25) / 2f, 20, 25, figMedium,
-                    f ? theme.onFocus : theme.text2, Paint.Align.LEFT);
+            float top = py + 16 + i * rowH;
+            int fg = f ? theme.onFocus : theme.text, fg2 = f ? theme.onFocus : theme.text2;
+            if (am[i].isEmpty()) {
+                drawText(c, en[i], px + 16 + 22, top + (rowH - 36) / 2f, 28, 36, figSemi, fg, Paint.Align.LEFT);
+            } else {
+                float w1 = drawText(c, am[i], px + 16 + 22, top + (rowH - 28 * 1.5f) / 2f, 28, 28 * 1.5f, menMedium, fg, Paint.Align.LEFT);
+                drawText(c, en[i], px + 16 + 22 + w1 + 16, top + (rowH - 25) / 2f, 20, 25, figMedium, fg2, Paint.Align.LEFT);
+            }
         }
     }
 
@@ -719,45 +714,21 @@ final class HabeshaHomeView extends View {
 
     // ------------------------------------------------------------------ saver
 
+    /** The screensaver: the woven ring with the clock inside it and the date beneath. It stays where it is. */
     private void drawSaver(Canvas c) {
-        long elapsed = Math.max(0, System.currentTimeMillis() - saverStart);
-        float dx = anim("driftx", driftX, 8000, EASE_IN_OUT, 0), dy = anim("drifty", driftY, 8000, EASE_IN_OUT, 0);
-        float cardH = 560 + 28 + 12 + 10 + 32 * 1.45f + 20 + 22 + 24 * 1.5f;
-        float top = H / 2f - cardH / 2f + dy;
-        float cx = W / 2f + dx;
+        float cardH = 560 + 26 + 36;
+        float top = H / 2f - cardH / 2f;
+        float cx = W / 2f;
         c.save();
         c.translate(cx, top + 280);
-        patterns.drawSaverRing(c, HabeshaStrings.coffeeProgress(elapsed));
+        patterns.drawSaverRing(c);
         c.restore();
-        drawText(c, HabeshaStrings.am("buna"), cx, top + 280 - 100 - 30, 26, 39, menMedium, theme.text2, Paint.Align.CENTER);
-        String time = timeString();
         int dim = (theme.text & 0xFFFFFF) | (0xE6 << 24);
-        drawText(c, time, cx, top + 280 - 84, 168, 168, geezNumerals ? menLight : bsLight, dim, Paint.Align.CENTER);
-        if (ethClock) drawText(c, Ethiopic.clockLine(now, geezNumerals), cx, top + 280 + 84 + 8, 32, 48, menLight, theme.accent, Paint.Align.CENTER);
-
-        int round = HabeshaStrings.coffeeRound(elapsed);
-        String[] keys = {"abol", "tona", "bereka"};
-        String[] en = {"Abol · first cup", "Tona · second cup", "Bereka · third cup"};
-        float colW = 0;
-        float[] cw = new float[3];
-        for (int i = 0; i < 3; i++) {
-            cw[i] = Math.max(width(HabeshaStrings.am(keys[i]), 32, menMedium), width(en[i], 20, figReg));
-            colW += cw[i];
-        }
-        float x = cx - (colW + 2 * 44) / 2f, ry = top + 560 + 28;
-        for (int i = 0; i < 3; i++) {
-            float mid = x + cw[i] / 2f;
-            float a = i == round ? 1f : 0.45f;
-            int dot = i < round ? theme.text2 : i == round ? theme.accent : 0;
-            paint.setStyle(Paint.Style.FILL);
-            if (dot != 0) { paint.setColor(dot); paint.setAlpha(Math.round(255 * a)); c.drawCircle(mid, ry + 6, 6, paint); }
-            else { stroke.setColor(theme.text2); stroke.setStrokeWidth(1); stroke.setAlpha(Math.round(255 * a)); c.drawCircle(mid, ry + 6, 5.5f, stroke); }
-            drawTextAlpha(c, HabeshaStrings.am(keys[i]), mid, ry + 22, 32, 32 * 1.45f, menMedium, i == round ? theme.text : theme.text2, a);
-            drawTextAlpha(c, en[i], mid, ry + 22 + 32 * 1.45f, 20, 26, figReg, theme.text2, a);
-            x += cw[i] + 44;
-        }
+        Typeface timeFont = geezNumerals ? menLight : bsLight;
+        drawText(c, timeString(), cx, top + 280 - 84 - 24, 168, 168, timeFont, dim, Paint.Align.CENTER);
+        if (ethClock) drawText(c, Ethiopic.clockLine(now, geezNumerals), cx, top + 280 + 60, 32, 48, menLight, theme.accent, Paint.Align.CENTER);
         String date = ethCalendar ? Ethiopic.dateLine(now, geezNumerals) + " · " + gregorian() : gregorian();
-        drawText(c, date, cx, ry + 22 + 32 * 1.45f + 26 + 22, 24, 36, menLight, theme.text2, Paint.Align.CENTER);
+        drawText(c, date, cx, top + 560 + 26, 24, 36, menLight, theme.text2, Paint.Align.CENTER);
     }
 
     private String gregorian() {

@@ -27,7 +27,6 @@ final class HabeshaPatterns {
     private final Paint dots = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint wovenA = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint wovenB = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint progress = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rect = new RectF();
     private final RectF src = new RectF(0, 0, MODULE_PX, MODULE_PX);
 
@@ -49,10 +48,6 @@ final class HabeshaPatterns {
         wovenB.setStrokeWidth(10);
         wovenB.setColor(theme.weave[1]);
         wovenB.setPathEffect(new DashPathEffect(new float[]{d, d}, d));
-        progress.setStyle(Paint.Style.STROKE);
-        progress.setStrokeWidth(8);
-        progress.setStrokeCap(Paint.Cap.ROUND);
-        progress.setColor(theme.accent);
     }
 
     /** One module drawn into a 96 px square, from the design's 48 unit drawing. */
@@ -171,14 +166,12 @@ final class HabeshaPatterns {
         c.restore();
     }
 
-    /** The screensaver ring centred on (0, 0): a track, the progress of the current cup, a woven band and dots. */
-    void drawSaverRing(Canvas c, float fraction) {
+    /** The screensaver ring centred on (0, 0): a thin track, a woven band and a dotted rim. */
+    void drawSaverRing(Canvas c) {
         line.setStrokeWidth(4);
         line.setColor(theme.glassB);
         line.setAlpha(Color.alpha(theme.glassB));
         c.drawCircle(0, 0, 212, line);
-        rect.set(-212, -212, 212, 212);
-        c.drawArc(rect, -90, 360f * fraction, false, progress);
         c.drawCircle(0, 0, 246, wovenA);
         c.drawCircle(0, 0, 246, wovenB);
         line.setStrokeWidth(4);

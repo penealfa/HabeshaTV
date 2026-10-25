@@ -16,7 +16,6 @@ import android.view.WindowManager;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Random;
 
 /**
  * The HabeshaTV home screen. Keys go to {@link HabeshaState}, {@link HabeshaHomeView} draws it, and this class does
@@ -24,33 +23,19 @@ import java.util.Random;
  */
 public class HabeshaHomeActivity extends Activity {
 
-    private static final long HOLD_MS = 550;
     private static final long IDLE_MS = 60_000;
     private static final long TOAST_MS = 2_000;
-    private static final long DRIFT_MS = 8_000;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
-    private final Random random = new Random();
     private HabeshaState state;
     private HabeshaHomeView view;
     private LinkedHashMap<String, HabeshaApps.AppInfo> installed = new LinkedHashMap<>();
 
-    private boolean okDown;      // OK is held down and a short press has not been decided yet
-    private boolean holdFired;
     private boolean swallowOkUp; // the OK that woke the saver should not also click
     private boolean resumed;
 
     private final BroadcastReceiver packages = new BroadcastReceiver() {
         @Override public void onReceive(Context context, Intent intent) { reloadApps(); }
-    };
-
-    private final Runnable holdRunnable = new Runnable() {
-        @Override public void run() {
-            if (!okDown) return;
-            holdFired = true;
-            state.hold();
-            view.invalidate();
-        }
     };
 
     private final Runnable idleRunnable = new Runnable() {
@@ -70,15 +55,6 @@ public class HabeshaHomeActivity extends Activity {
         @Override public void run() {
             view.setTime(System.currentTimeMillis());
             handler.postDelayed(this, state.screen == HabeshaState.Screen.SAVER ? 1_000 : 5_000);
-        }
-    };
-
-    private final Runnable drift = new Runnable() {
-        @Override public void run() {
-            if (state.screen == HabeshaState.Screen.SAVER) {
-                view.setDrift(Math.round((random.nextFloat() * 2 - 1) * 220), Math.round((random.nextFloat() * 2 - 1) * 60));
-            }
-            handler.postDelayed(this, DRIFT_MS);
         }
     };
 
@@ -122,14 +98,12 @@ public class HabeshaHomeActivity extends Activity {
         view.setTime(System.currentTimeMillis());
         handler.post(tick);
         handler.post(wifiTick);
-        handler.postDelayed(drift, DRIFT_MS);
         bumpIdle();
     }
 
     @Override
     protected void onPause() {
         resumed = false;
-        okDown = false;
         state.toast = null; // its timer is cancelled below, so a message must not be left on screen
         handler.removeCallbacksAndMessages(null);
         super.onPause();
@@ -166,8 +140,6 @@ public class HabeshaHomeActivity extends Activity {
 
     private void startSaver() {
         state.startSaver();
-        view.setSaverStart(System.currentTimeMillis());
-        view.setDrift(0, 0);
         view.invalidate();
     }
 
@@ -199,11 +171,9 @@ public class HabeshaHomeActivity extends Activity {
             case KeyEvent.KEYCODE_BUTTON_A:
                 if (event.getRepeatCount() > 0) return true;
                 if (state.canHold()) {
-                    // Short press launches, long press opens the menu: decided on key up or after HOLD_MS.
-                    okDown = true;
-                    holdFired = false;
-                    handler.removeCallbacks(holdRunnable);
-                    handler.postDelayed(holdRunnable, HOLD_MS);
+                    // A short press launches, a long press opens the menu: Android tells us which on key up or
+                    // through onKeyLongPress, using the same timeout as every other app on this TV.
+                    event.startTracking();
                     return true;
                 }
                 doOk();
@@ -213,7 +183,7 @@ public class HabeshaHomeActivity extends Activity {
                 state.back();
                 break;
             case KeyEvent.KEYCODE_MENU:
-                cycleTheme();
+                cycleTheme(true);
                 return true;
             default:
                 return super.onKeyDown(keyCode, event);
@@ -223,18 +193,24 @@ public class HabeshaHomeActivity extends Activity {
     }
 
     @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        if (isOk(keyCode) && state.canHold()) {
+            state.hold();
+            view.invalidate();
+            return true;
+        }
+        return super.onKeyLongPress(keyCode, event);
+    }
+
+    @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (!isOk(keyCode)) return super.onKeyUp(keyCode, event);
         if (swallowOkUp) {
             swallowOkUp = false;
             return true;
         }
-        if (okDown) {
-            okDown = false;
-            handler.removeCallbacks(holdRunnable);
-            if (!holdFired) doOk();
-            holdFired = false;
-        }
+        // A press that became a long press arrives here cancelled: the menu is already open, so do nothing.
+        if (event.isTracking() && !event.isCanceled()) doOk();
         return true;
     }
 
@@ -256,6 +232,8 @@ public class HabeshaHomeActivity extends Activity {
             } else {
                 state.toast = new HabeshaState.Toast(null, "Could not open this app", null);
             }
+        } else if ("theme".equals(action.system)) {
+            cycleTheme(false); // from the hold-OK menu: the row shows the name, so no message
         } else if (action.system != null) {
             openSystem(action.system);
         }
@@ -276,13 +254,15 @@ public class HabeshaHomeActivity extends Activity {
         }
     }
 
-    /** The Menu key steps through the four looks and remembers the last one. */
-    private void cycleTheme() {
+    /** The Theme row (and the Menu key, on remotes that have one) steps through the four looks and remembers it. */
+    private void cycleTheme(boolean announce) {
         String next = HabeshaTheme.next(view.theme().name);
         HabeshaApps.saveTheme(this, next);
         view.setTheme(HabeshaTheme.byName(next));
-        state.toast = new HabeshaState.Toast(null, "Theme: " + next, null);
-        showToastTimer();
+        if (announce) {
+            state.toast = new HabeshaState.Toast(null, "Theme: " + next, null);
+            showToastTimer();
+        }
         view.invalidate();
     }
 }

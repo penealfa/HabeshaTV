@@ -12,7 +12,7 @@ final class HabeshaState {
     static final String LIBRARY_ID = "__lib";
     static final int COLUMNS = 6;
     static final int BUTTON_APPS = 0, BUTTON_WIFI = 1, BUTTON_SETTINGS = 2;
-    static final int MENU_MOVE = 0, MENU_REMOVE = 1, MENU_CANCEL = 2;
+    static final int MENU_MOVE = 0, MENU_REMOVE = 1, MENU_THEME = 2, MENU_CANCEL = 3;
 
     enum Screen { HOME, LIBRARY, SAVER }
     enum Zone { RING, TOP }
@@ -22,7 +22,7 @@ final class HabeshaState {
     static final class Action {
         static final Action NONE = new Action(null, null);
         final String launchPackage;
-        final String system; // "settings", "wifi" or null
+        final String system; // "settings", "wifi", "theme" or null
 
         private Action(String launchPackage, String system) {
             this.launchPackage = launchPackage;
@@ -127,7 +127,7 @@ final class HabeshaState {
         }
         if (menuOpen) {
             if (dy < 0) menuIndex = Math.max(0, menuIndex - 1);
-            if (dy > 0) menuIndex = Math.min(2, menuIndex + 1);
+            if (dy > 0) menuIndex = Math.min(MENU_CANCEL, menuIndex + 1);
             return;
         }
         if (moving) {
@@ -193,6 +193,7 @@ final class HabeshaState {
         if (menuOpen) {
             if (menuIndex == MENU_MOVE) { menuOpen = false; moving = true; }
             else if (menuIndex == MENU_REMOVE) removeFocused();
+            else if (menuIndex == MENU_THEME) return Action.system("theme"); // the menu stays open to try the next look
             else menuOpen = false;
             return Action.NONE;
         }

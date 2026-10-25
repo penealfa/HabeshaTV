@@ -31,10 +31,6 @@ final class HabeshaStrings {
         AM.put("moving", "በማንቀሳቀስ ላይ");
         AM.put("added", "ታክሏል");
         AM.put("removed", "ተወግዷል");
-        AM.put("buna", "የቡና ሰዓት");
-        AM.put("abol", "አቦል");
-        AM.put("tona", "ቶና");
-        AM.put("bereka", "በረካ");
     }
 
     private HabeshaStrings() {
@@ -60,16 +56,4 @@ final class HabeshaStrings {
             default: return "Good evening";
         }
     }
-
-    /** Which of the three coffee cups (0 Abol, 1 Tona, 2 Bereka) is being poured, ten minutes each. */
-    static int coffeeRound(long elapsedMs) {
-        return (int) (Math.max(0, elapsedMs) / COFFEE_ROUND_MS % 3);
-    }
-
-    /** How far through the current cup, 0 to just under 1. */
-    static float coffeeProgress(long elapsedMs) {
-        return (float) (Math.max(0, elapsedMs) % COFFEE_ROUND_MS) / COFFEE_ROUND_MS;
-    }
-
-    static final long COFFEE_ROUND_MS = 10L * 60 * 1000;
 }
