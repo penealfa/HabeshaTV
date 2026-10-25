@@ -20,6 +20,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * Draws the HabeshaTV screens from {@link HabeshaState} on a 1920 x 1080 stage scaled to fit the display. Everything is
@@ -121,6 +122,9 @@ final class HabeshaHomeView extends View {
     }
 
     void setTime(long millis) {
+        // A calendar keeps the zone it was made with, so follow the device's zone on every tick: it changes when the
+        // zone is corrected, at daylight saving, or when the stick moves.
+        now.setTimeZone(TimeZone.getDefault());
         now.setTimeInMillis(millis);
         invalidate();
     }
