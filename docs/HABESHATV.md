@@ -5,8 +5,10 @@ Design source: `HabeshaTV v3.dc.html` (kept outside this repo until the photo ri
 ## Decisions
 - Repo: private copy of Gathin23/cleanyourtv (MIT), not a GitHub fork.
 - Third top button: **Apps** replaces **Inputs** (the Mi Box has no HDMI inputs or live TV).
-- Default theme: `mesob` (basket photo wallpaper; generate our own wallpaper from the weave patterns
-  before this repo is ever made public).
+- Default theme: `mesob`, with the basket photo from the design as its wallpaper
+  (`launcher/app/src/main/res/drawable-nodpi/wallpaper_mesob.jpg`). The photo's licence is unverified: keep this
+  repo private, or swap in a wallpaper made from the weave patterns, before it is ever made public.
+- The big clock shows Ethiopian hours (10:24 reads 4:24); the line beside it spells the hour in Amharic.
 - Amharic strings reviewed by the owner (native reader).
 
 ## Status (tested on the Mi Box 4, Android 9)
@@ -16,7 +18,7 @@ Not yet tried on the TV: hold-OK menu and move mode, the Settings and Apps butto
 animations feel, the other three themes.
 
 Known gaps: the Mi Box remote has no Menu key, so the theme switch is unreachable from it; the debug build is signed
-with the debug key; the mesob theme has no photo (rights).
+with the debug key; the wallpaper photo's licence is unverified.
 
 Undo on the stick: run `restore.sh` in the project folder; it re-enables the stock launcher and uninstalls this app.
 

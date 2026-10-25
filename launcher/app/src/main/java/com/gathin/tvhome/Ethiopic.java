@@ -51,6 +51,17 @@ final class Ethiopic {
         return period + " " + hour + ":" + (minute < 10 ? "0" : "") + minute;
     }
 
+    /**
+     * The big clock in Ethiopian hours: 10:24 reads 4:24 and 9:00 reads 3:00, because the Ethiopian day starts at
+     * 6:00. Ge'ez numerals give "፬:፳፬"; the hour alone when the minute is zero, like the Ge'ez clock words.
+     */
+    static String clockDigits(Calendar c, boolean geezNumerals) {
+        int hour = clockHour(c.get(Calendar.HOUR_OF_DAY));
+        int minute = c.get(Calendar.MINUTE);
+        if (geezNumerals) return minute == 0 ? geez(hour) : geez(hour) + ":" + geez(minute);
+        return hour + ":" + (minute < 10 ? "0" : "") + minute;
+    }
+
     /** Gregorian to Ethiopian. Returns {year, month 1 to 13, day}. Month 13 is Pagume (5 or 6 days). */
     static int[] fromGregorian(int year, int month, int day) {
         int a = (14 - month) / 12;

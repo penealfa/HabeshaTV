@@ -88,6 +88,29 @@ public class EthiopicTest {
     }
 
     @Test
+    public void bigClockShowsEthiopianHours() {
+        Calendar c = new GregorianCalendar(2026, Calendar.OCTOBER, 25, 10, 24);
+        assertEquals("፬:፳፬", Ethiopic.clockDigits(c, true)); // 10:24 is 4:24
+        assertEquals("4:24", Ethiopic.clockDigits(c, false));
+        c.set(Calendar.HOUR_OF_DAY, 9);
+        c.set(Calendar.MINUTE, 5);
+        assertEquals("፫:፭", Ethiopic.clockDigits(c, true)); // 9 is 3
+        assertEquals("3:05", Ethiopic.clockDigits(c, false));
+        c.set(Calendar.HOUR_OF_DAY, 6);
+        c.set(Calendar.MINUTE, 0);
+        assertEquals("፲፪", Ethiopic.clockDigits(c, true)); // 6:00 is 12 o'clock
+        c.set(Calendar.HOUR_OF_DAY, 18);
+        assertEquals("12:00", Ethiopic.clockDigits(c, false)); // 18:00 is 12 o'clock again
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 30);
+        assertEquals("6:30", Ethiopic.clockDigits(c, false)); // midnight is 6
+        c.set(Calendar.HOUR_OF_DAY, 17);
+        assertEquals("11:30", Ethiopic.clockDigits(c, false));
+        c.set(Calendar.HOUR_OF_DAY, 23);
+        assertEquals("5:30", Ethiopic.clockDigits(c, false));
+    }
+
+    @Test
     public void dateAndClockLines() {
         Calendar c = new GregorianCalendar(2026, Calendar.OCTOBER, 25, 8, 15); // a Sunday
         assertEquals("እሑድ፣ ጥቅምት ፲፭ ፳፻፲፱", Ethiopic.dateLine(c, true));

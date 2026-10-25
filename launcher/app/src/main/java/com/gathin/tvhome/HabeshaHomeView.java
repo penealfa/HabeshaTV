@@ -3,6 +3,7 @@ package com.gathin.tvhome;
 import android.animation.TimeInterpolator;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
@@ -57,6 +58,8 @@ final class HabeshaHomeView extends View {
     private final RectF box = new RectF();
     private final Path path = new Path();
 
+    private Bitmap photo;
+    private Shader scrimShader;
     private Shader glowShader, warmShader;
     private int glowShaderColor, glowShaderThemeKey;
 
@@ -98,6 +101,12 @@ final class HabeshaHomeView extends View {
         patterns = new HabeshaPatterns(t);
         glowShader = null;
         warmShader = null;
+        photo = null; // let the old photo go before decoding another: it is 8 MB on a 2 GB stick
+        if (t.hasPhoto()) {
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inScaled = false;
+            photo = BitmapFactory.decodeResource(getResources(), R.drawable.wallpaper_mesob, o);
+        }
         invalidate();
     }
 
@@ -228,6 +237,7 @@ final class HabeshaHomeView extends View {
         canvas.scale(scale, scale);
         canvas.clipRect(0, 0, W, H);
         canvas.drawColor(theme.bg);
+        drawPhoto(canvas);
         switch (st.screen) {
             case SAVER: drawSaver(canvas); break;
             case LIBRARY: drawLibrary(canvas); drawToast(canvas, 980); break;
@@ -238,6 +248,26 @@ final class HabeshaHomeView extends View {
             if (st.screen == HabeshaState.Screen.SAVER) postInvalidateDelayed(40);
             else postInvalidateOnAnimation();
         }
+    }
+
+    /** The basket photo with the design's dark scrim, behind every screen: 90% black in the middle, 60% at the edges. */
+    private void drawPhoto(Canvas c) {
+        if (photo == null) return;
+        box.set(0, 0, W, H);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAlpha(255);
+        c.drawBitmap(photo, null, box, paint);
+        if (scrimShader == null) {
+            scrimShader = new RadialGradient(0, 0, 1152f, new int[]{0xE60B0806, 0xC70B0806, 0x990B0806},
+                    new float[]{0f, 0.55f, 1f}, Shader.TileMode.CLAMP);
+        }
+        c.save();
+        c.translate(960f, 0.62f * H);
+        c.scale(1f, 0.70f * H / 1152f);
+        paint.setShader(scrimShader);
+        c.drawRect(-1152f, -1152f, 1152f, 1152f, paint);
+        paint.setShader(null);
+        c.restore();
     }
 
     private void drawHome(Canvas c) {
@@ -496,11 +526,9 @@ final class HabeshaHomeView extends View {
         drawText(c, greg, tx, ty, 22, 22 * 1.4f, figReg, theme.text2, Paint.Align.LEFT);
     }
 
+    /** The big clock: Ethiopian hours, so 10:24 shows 4:24. */
     private String timeString() {
-        int h12 = now.get(Calendar.HOUR) == 0 ? 12 : now.get(Calendar.HOUR);
-        int mi = now.get(Calendar.MINUTE);
-        if (geezNumerals) return mi == 0 ? Ethiopic.geez(h12) : Ethiopic.geez(h12) + ":" + Ethiopic.geez(mi);
-        return h12 + ":" + (mi < 10 ? "0" : "") + mi;
+        return Ethiopic.clockDigits(now, geezNumerals);
     }
 
     private void drawLibraryHint(Canvas c) {

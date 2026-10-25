@@ -2,8 +2,7 @@ package com.gathin.tvhome;
 
 /**
  * Colours of the HabeshaTV home screen, from the design. All values are 0xAARRGGBB. The design's "mesob" theme
- * has a basket photo behind it; the photo is not shipped (rights), so here it is the lalibela colours with
- * warmer glass.
+ * has the basket photo behind it, darkened by a scrim so the text stays readable; the other looks are plain.
  */
 final class HabeshaTheme {
 
@@ -31,6 +30,9 @@ final class HabeshaTheme {
         this.weave = weave;
         this.pairs = pairs;
     }
+
+    /** Only the mesob look has a photo behind it (the basket wallpaper); the others are plain colour. */
+    boolean hasPhoto() { return "mesob".equals(name); }
 
     static final String[] NAMES = {"mesob", "tilet", "lalibela", "buna"};
 
