@@ -557,9 +557,8 @@ final class HabeshaHomeView extends View {
         float hy = anim("menuhl", py + 16 + st.menuIndex * rowH, 220, SPRING, 0);
         round(c, px + 16, hy, px + pw - 16, hy + rowH, 18, theme.focus);
         String name = theme.name.substring(0, 1).toUpperCase() + theme.name.substring(1);
-        // The Theme row has no Amharic yet (it has not been reviewed), so it is English only.
-        String[] am = {HabeshaStrings.am("move"), HabeshaStrings.am("remove"), "", HabeshaStrings.am("cancel")};
-        String[] en = {"Move", "Remove", "Theme · " + name, "Cancel"};
+        String[] am = {HabeshaStrings.am("move"), HabeshaStrings.am("remove"), HabeshaStrings.am("theme"), HabeshaStrings.am("cancel")};
+        String[] en = {"Move", "Remove", name, "Cancel"};
         for (int i = 0; i < 4; i++) {
             boolean f = st.menuIndex == i;
             float top = py + 16 + i * rowH;

@@ -24,6 +24,7 @@ final class HabeshaStrings {
         AM.put("move", "አንቀሳቅስ");
         AM.put("remove", "ከመሶቡ አስወግድ");
         AM.put("cancel", "ተመለስ");
+        AM.put("theme", "ገጽታ");
         AM.put("addHome", "ወደ መሶቡ አክል");
         AM.put("onHome", "መሶቡ ላይ");
         AM.put("library", "ሁሉም መተግበሪያዎች");
