@@ -130,6 +130,7 @@ public class HabeshaHomeActivity extends Activity {
     protected void onPause() {
         resumed = false;
         okDown = false;
+        state.toast = null; // its timer is cancelled below, so a message must not be left on screen
         handler.removeCallbacksAndMessages(null);
         super.onPause();
     }

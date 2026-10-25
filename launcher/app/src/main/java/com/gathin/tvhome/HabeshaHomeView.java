@@ -467,12 +467,14 @@ final class HabeshaHomeView extends View {
         float size = 112f;
         text.setLetterSpacing(0.01f);
         float nameW = width(name, size, bsBold);
-        if (nameW > 1000f) size = size * 1000f / nameW;
+        // Stay between the two tiles beside the focused one (their inner edges are about 726 px apart).
+        if (nameW > 720f) size = size * 720f / nameW;
         drawText(c, name, 960f, 676, size, 112f, bsBold, theme.text, Paint.Align.CENTER);
         text.setLetterSpacing(0f);
 
         String time = timeString();
-        float timeW = width(time, 124, bsLight);
+        Typeface timeFont = geezNumerals ? menLight : bsLight;
+        float timeW = width(time, 124, timeFont);
         String eth = ethClock ? Ethiopic.clockLine(now, geezNumerals) : null;
         String ethDate = ethCalendar ? Ethiopic.dateLine(now, geezNumerals) : null;
         String greg = EN_WEEKDAYS[now.get(Calendar.DAY_OF_WEEK) - 1] + " " + now.get(Calendar.DAY_OF_MONTH) + " "
@@ -481,7 +483,7 @@ final class HabeshaHomeView extends View {
         float total = timeW + 36 + 2 + 36 + colW;
         float x = 960f - total / 2f;
         float top = 676 + 112 + 34;
-        drawText(c, time, x, top, 124, 124, bsLight, theme.text, Paint.Align.LEFT);
+        drawText(c, time, x, top, 124, 124, timeFont, theme.text, Paint.Align.LEFT);
         float dx = x + timeW + 36;
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(theme.glassB);
@@ -702,7 +704,7 @@ final class HabeshaHomeView extends View {
         drawText(c, HabeshaStrings.am("buna"), cx, top + 280 - 100 - 30, 26, 39, menMedium, theme.text2, Paint.Align.CENTER);
         String time = timeString();
         int dim = (theme.text & 0xFFFFFF) | (0xE6 << 24);
-        drawText(c, time, cx, top + 280 - 84, 168, 168, bsLight, dim, Paint.Align.CENTER);
+        drawText(c, time, cx, top + 280 - 84, 168, 168, geezNumerals ? menLight : bsLight, dim, Paint.Align.CENTER);
         if (ethClock) drawText(c, Ethiopic.clockLine(now, geezNumerals), cx, top + 280 + 84 + 8, 32, 48, menLight, theme.accent, Paint.Align.CENTER);
 
         int round = HabeshaStrings.coffeeRound(elapsed);
