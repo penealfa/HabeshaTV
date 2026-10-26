@@ -1,13 +1,12 @@
 # HabeshaTV plan
 
-Design source: `HabeshaTV v3.dc.html` (kept outside this repo until the photo rights are sorted).
+Design source: `HabeshaTV v3.dc.html` (kept outside this repo).
 
 ## Decisions
 - Repo: private copy of Gathin23/cleanyourtv (MIT), not a GitHub fork.
 - Third top button: **Apps** replaces **Inputs** (the Mi Box has no HDMI inputs or live TV).
 - Default theme: `mesob`, with the basket photo from the design as its wallpaper
-  (`launcher/app/src/main/res/drawable-nodpi/wallpaper_mesob.jpg`). The photo's licence is unverified: keep this
-  repo private, or swap in a wallpaper made from the weave patterns, before it is ever made public.
+  (`launcher/app/src/main/res/drawable-nodpi/wallpaper_mesob.jpg`). The photo is the author's own.
 - The big clock shows Ethiopian hours (10:24 reads 4:24); the line beside it spells the hour in Amharic.
 - Amharic strings reviewed by the owner (native reader).
 
@@ -18,7 +17,7 @@ Ethiopian date and clock, and the basket wallpaper.
 Not yet tried on the TV: move mode, the Remove row, the Settings and Apps buttons, how smooth the animations feel.
 
 Known gaps: the screensaver no longer drifts,
-so a bright still image stays on screen (burn-in is a risk on OLED sets); the debug build is signed with the debug key; the wallpaper photo's licence is unverified.
+so a bright still image stays on screen (burn-in is a risk on OLED sets); the build is signed with the debug key.
 
 Undo on the stick: run `restore.sh` in the project folder; it re-enables the stock launcher and uninstalls this app.
 
