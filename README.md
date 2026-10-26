@@ -97,5 +97,5 @@ The design is plain code you can change. The colours and looks live in `HabeshaT
 
 - Built on **[CleanYourTV](https://github.com/Gathin23/cleanyourtv)** by Gathin and its contributors, MIT licensed. The original licence and copyright are kept in [LICENSE](LICENSE).
 - Fonts: Menbere, Figtree and Big Shoulders Display (SIL Open Font License; see `launcher/FONT-LICENSE-HABESHA-OFL.txt`), plus Outfit from the original launcher.
-- The basket wallpaper photograph is the author's own.
+- The basket wallpaper photograph is the author's own. The wallpapers in `themes/` come from the original project; each theme's `CREDITS.md` names the photographer and licence, and those files must stay with the images.
 - The package name `com.gathin.tvhome` is kept from the original project so the two stay compatible.
