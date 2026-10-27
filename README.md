@@ -82,6 +82,13 @@ adb shell pm disable-user --user 0 com.google.android.tvlauncher
 
 On Google TV the setup wizard (`com.google.android.tungsten.setupwraith`) also answers the Home button and outranks any launcher you install, so step 4 alone opens a black recovery screen. The only way around it is disabling the wizard, which the CleanYourTV notes warn can erase the saved Wi-Fi network and, on one TV, led to a factory reset after a reboot on that screen. See [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) before you try, and if the screen goes black, **re-enable the stock launcher and don't reboot**.
 
+## Permissions and network
+
+- **No network access.** The app does not ask for `INTERNET`, so it cannot send anything off the TV. It has no ads, no analytics and no self-updater.
+- **What it asks for:** network and Wi-Fi state, and location, which Android requires before it will show the Wi-Fi network's name. `WRITE_SECURE_SETTINGS` is declared too, but Android only gives it to an app if you grant it over `adb`, and nothing here asks you to.
+- **Accessibility helper services** (`HomeKeyService`, `InputKeyService`) come from the original launcher. They are **off unless you switch them on**, and HabeshaTV does not need either.
+- **Turn network ADB off when you are done:** switch USB debugging off in Developer options, or reboot a TV that does not keep it on.
+
 ## Undo
 
 ```bash
